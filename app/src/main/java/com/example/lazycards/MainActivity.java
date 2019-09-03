@@ -2,8 +2,10 @@ package com.example.lazycards;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
+//import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -11,9 +13,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+
 
 public class MainActivity extends AppCompatActivity {
     private final String web_server = "";
@@ -35,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
      */
     public void submit(View view){
   //      Intent intent = new Intent(this, Submit.class);
-        EditText word_et = (EditText) findViewById(R.id.editText_word);
-        EditText deck_et = (EditText) findViewById(R.id.editText_deck);
-        EditText tags_et = (EditText) findViewById(R.id.editText_tags);
+        EditText word_et = findViewById(R.id.editText_word);
+        EditText deck_et = findViewById(R.id.editText_deck);
+        EditText tags_et = findViewById(R.id.editText_tags);
 
         String word = word_et.getText().toString();
         String deck = deck_et.getText().toString();
@@ -48,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             payload.put("word", word);
             payload.put("deck", deck);
+            payload.put("ankact", "addNote"); // for APIs
 
             JSONArray tags_j = new JSONArray();
             for(String s : tags){ tags_j.put(s); }
@@ -57,7 +67,17 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace(); // wil this ever even happen??
         }
 
-        fast_post(payload);
+
+
+        TestPost newReq = new TestPost();
+        try {
+            String result = newReq.execute(payload).get();
+            Log.d("RESULT", result);
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+        //fast_post(payload);
     }
 
     private List<String> splitTags(EditText tags_et){
@@ -69,7 +89,66 @@ public class MainActivity extends AppCompatActivity {
         return Arrays.asList(items);
     }
 
-    private void fast_post(JSONObject data){
+    private void fast_post(JSONObject word){
 
     }
+
+    private static class TestPost extends AsyncTask<JSONObject, Void, String> {
+
+        private static final String REQUEST_METHOD = "POST";
+        private static final int READ_TIMEOUT = 15000;
+        private static final int CONNECTION_TIMEOUT = 15000;
+        @Override
+        protected String doInBackground(JSONObject... objs) {
+            JSONObject strURL = objs[0];
+            String result = "";
+            String inputLine;
+            String URL = "http://192.168.1.226/lazycards/fast_sub";
+            try {
+                //Create a URL object holding our url
+                URL myUrl = new URL(URL);         //Create a connection
+                HttpURLConnection connection = (HttpURLConnection) myUrl.openConnection();         //Set methods and timeouts
+                connection.setRequestMethod(REQUEST_METHOD);
+                connection.setReadTimeout(READ_TIMEOUT);
+                connection.setConnectTimeout(CONNECTION_TIMEOUT);
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+
+                connection.setDoOutput(true);
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+                Log.d("efwef", objs[0].toString());
+                wr.write(objs[0].toString().getBytes());
+                wr.flush();
+                wr.close();
+
+
+                //Connect to our url
+                connection.connect();         //Create a new InputStreamReader
+
+                InputStreamReader streamReader = new InputStreamReader(connection.getInputStream());         //Create a new buffered reader and String Builder
+                BufferedReader reader = new BufferedReader(streamReader);
+
+                StringBuilder stringBuilder = new StringBuilder();         //Check if the line we are reading is not null
+                while((inputLine = reader.readLine()) != null){
+                    stringBuilder.append(inputLine);
+                }         //Close our InputStream and Buffered reader
+                reader.close();
+                streamReader.close();         //Set our result equal to our stringBuilder
+                result = stringBuilder.toString();
+            }
+            catch(Exception ex){
+                ex.printStackTrace();
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String result){
+            super.onPostExecute(result);
+        }
+
+    }
+
+
+
 }
