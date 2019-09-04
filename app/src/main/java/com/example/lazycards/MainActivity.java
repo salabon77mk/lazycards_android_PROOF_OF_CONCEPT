@@ -15,23 +15,31 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import java.util.concurrent.ExecutionException;
 
 
 public class MainActivity extends AppCompatActivity {
-    private final String web_server = "";
-
-    protected static final String FAST_SUB = "FAST_SUB";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Server_Endpoints srv = new Server_Endpoints();
+        srv.execute();
+
+        //Server_Endpoints.setHost();
     }
 
     /* Fast submit that creates an array of
@@ -48,36 +56,37 @@ public class MainActivity extends AppCompatActivity {
         EditText deck_et = findViewById(R.id.editText_deck);
         EditText tags_et = findViewById(R.id.editText_tags);
 
-        String word = word_et.getText().toString();
-        String deck = deck_et.getText().toString();
+        final String word = word_et.getText().toString();
+        final String deck = deck_et.getText().toString();
         List<String> tags = splitTags(tags_et);
 
         JSONObject payload = new JSONObject();
 
         try {
-            payload.put("word", word);
-            payload.put("deck", deck);
-            payload.put("ankact", "addNote"); // for APIs
+            payload.put(JSON_Keys.WORD, word);
+            payload.put(JSON_Keys.DECK, deck);
+            payload.put(JSON_Keys.ANKACT, Anki_Actions.ADDNOTE); // for APIs
 
             JSONArray tags_j = new JSONArray();
             for(String s : tags){ tags_j.put(s); }
 
-            payload.put("tags", tags_j);
+            payload.put(JSON_Keys.TAGS, tags_j);
         } catch (JSONException e) {
-            e.printStackTrace(); // wil this ever even happen??
+            Log.e("LAZYCARDS", "Unexpected JSON error in MainActivity.java:submit()");
         }
-
 
 
         TestPost newReq = new TestPost();
         try {
             String result = newReq.execute(payload).get();
             Log.d("RESULT", result);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
-        catch(Exception ex){
-            ex.printStackTrace();
-        }
-        //fast_post(payload);
+
+
     }
 
     private List<String> splitTags(EditText tags_et){
@@ -103,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
             JSONObject strURL = objs[0];
             String result = "";
             String inputLine;
-            String URL = "http://192.168.1.226/lazycards/fast_sub";
+            String URL = Server_Endpoints.FAST_SUB;
             try {
                 //Create a URL object holding our url
                 URL myUrl = new URL(URL);         //Create a connection
@@ -135,10 +144,14 @@ public class MainActivity extends AppCompatActivity {
                 reader.close();
                 streamReader.close();         //Set our result equal to our stringBuilder
                 result = stringBuilder.toString();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            catch(Exception ex){
-                ex.printStackTrace();
-            }
+
             return result;
         }
 
@@ -148,7 +161,4 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
-
-
 }

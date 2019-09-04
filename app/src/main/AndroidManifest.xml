@@ -4,7 +4,7 @@
 
     <!-- REMOVE THIS IF LOGIN IS EVER IMPLEMENTED -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!-- REMOVE THIS IF LOGIN IS EVER IMPLEMENTED -->
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,10 +12,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-
         android:usesCleartextTraffic="true">
-        <!-- REMOVE android:usesCleartextTraffic="true" IF LOGIN IS EVER IMPLEMENTED -->
-        <activity android:name=".Submit"></activity>
+        <service
+            android:name=".IPScanService"
+            android:exported="false"></service>
+
+        <activity android:name=".IPScan" /> <!-- REMOVE android:usesCleartextTraffic="true" IF LOGIN IS EVER IMPLEMENTED -->
+        <activity android:name=".Submit" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
