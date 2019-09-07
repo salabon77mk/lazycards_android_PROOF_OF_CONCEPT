@@ -13,13 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <service
-            android:name=".IPScanService"
-            android:exported="false"></service>
-
-        <activity android:name=".IPScan" /> <!-- REMOVE android:usesCleartextTraffic="true" IF LOGIN IS EVER IMPLEMENTED -->
-        <activity android:name=".Submit" />
-        <activity android:name=".MainActivity">
+        <!-- REMOVE android:usesCleartextTraffic="true" IF LOGIN IS EVER IMPLEMENTED -->
+        <activity android:name=".activities.IPScan" />
+        <activity android:name=".activities.Submit" />
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,4 +1,4 @@
-package com.example.lazycards;
+package com.example.lazycards.server;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -8,9 +8,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class Server_Endpoints extends AsyncTask<Void, Void, Void> {
-    static String host;
-    static final int TIMEOUT = 1000;
-    static final String FAST_SUB = "http://192.168.1.226/lazycards/fast_sub";
+    private static String host;
+    private static final int TIMEOUT = 1000;
+    public static final String FAST_SUB = "http://192.168.1.226/lazycards/fast_sub";
 
     static void setHost(){
         get192();

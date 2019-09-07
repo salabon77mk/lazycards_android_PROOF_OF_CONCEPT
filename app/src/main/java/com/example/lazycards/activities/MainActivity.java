@@ -1,13 +1,19 @@
-package com.example.lazycards;
+package com.example.lazycards.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 //import android.content.Intent;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+
+import com.example.lazycards.R;
+import com.example.lazycards.server.Anki_Actions;
+import com.example.lazycards.server.JSON_Keys;
+import com.example.lazycards.server.Server_Endpoints;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Server_Endpoints srv = new Server_Endpoints();
-        srv.execute();
+    //    Server_Endpoints srv = new Server_Endpoints();
+    //    srv.execute();
 
         //Server_Endpoints.setHost();
     }
@@ -98,12 +104,14 @@ public class MainActivity extends AppCompatActivity {
         return Arrays.asList(items);
     }
 
-    private void fast_post(JSONObject word){
-
+    // For debug, delete later
+    public void gotoNetworkScan(View view){
+        Intent intent = new Intent(this, IPScan.class);
+        startActivity(intent);
     }
 
     private static class TestPost extends AsyncTask<JSONObject, Void, String> {
-
+        // TODO clean this code of redundancy
         private static final String REQUEST_METHOD = "POST";
         private static final int READ_TIMEOUT = 15000;
         private static final int CONNECTION_TIMEOUT = 15000;
